@@ -1,0 +1,10 @@
+{
+  "schema": "zvukbook-windows-desktop-v1",
+  "device": "cpu",
+  "edition": "full",
+  "available_devices": ["cpu", "cuda"],
+  "model_id": "v5_6_ru",
+  "model_sha256": "04cc9b1d08ce38bcaa9d02c488d80d3e6806d17f7eaa7c95982f36a3cbf50b2e",
+  "resource_policy": "economical-v1",
+  "device_selection_required": true
+}

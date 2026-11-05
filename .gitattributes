@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+# Preserve the upstream license bytes used by SHA verification.
+/licenses/silero-v5_6_ru/LICENSE -text

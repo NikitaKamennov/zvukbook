@@ -1,0 +1,6 @@
+.device-choice{display:flex;align-items:flex-start;gap:14px;padding:18px;border:1px solid var(--line);border-radius:12px;margin:16px 0;cursor:pointer}
+.device-choice input{margin-top:4px;accent-color:var(--green)}
+.device-choice strong,.device-choice small{display:block}
+.device-choice small{font-weight:400;color:var(--muted);line-height:1.5;margin-top:6px}
+#device-settings{max-width:640px}#device-settings .section-heading h2{margin:0}
+#job-diagnostics{margin-top:14px}#job-diagnostics summary{cursor:pointer}#job-diagnostics-text{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.8rem;line-height:1.6}#retry-import{margin-top:12px}

@@ -1,0 +1,15 @@
+{
+  "schema": "zvukbook-windows-downloads-v1",
+  "files": [
+    {"file": "python-3.12.10-embed-amd64.zip", "url": "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip", "sha256": "4acbed6dd1c744b0376e3b1cf57ce906f9dc9e95e68824584c8099a63025a3c3"},
+    {"file": "ffmpeg-release-essentials.zip", "url": "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip", "sha256": "60f467265b1e312373dbcd92200c2618a74850f98d3d078e94296bb3fa2047ba"},
+    {"file": "7zr.exe", "url": "https://github.com/ip7z/7zip/releases/download/26.05/7zr.exe", "sha256": "9bf582b894dfa665f852d7e9112b02290a1c303c2d95a21fcdc41ffcb03143b7"},
+    {"file": "7z2605-x64.exe", "url": "https://github.com/ip7z/7zip/releases/download/26.05/7z2605-x64.exe", "sha256": "fd99e86f57d8f429ef5ed045bf98315af962e2309b0f1ba87a147a44c71647d0"},
+    {"file": "tesseract-5.5.3-github.exe", "url": "https://github.com/tesseract-ocr/tesseract/releases/download/5.5.3/tesseract-ocr-w64-setup-5.5.3.20260724.exe", "sha256": "bee9e3434bd94fd65387d9be28cd467a41f61b1275383b55b0f59a1331270ae4"},
+    {"file": "rus-4.1.0.traineddata", "url": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/4.1.0/rus.traineddata", "sha256": "e16e5e036cce1d9ec2b00063cf8b54472625b9e14d893a169e2b0dedeb4df225"},
+    {"file": "djvulibre-3.5.29-curl.exe", "url": "https://master.dl.sourceforge.net/project/djvu/DjVuLibre_Windows/3.5.29+4.12/DjVuLibre-3.5.29_DjView-4.12_Setup.exe?viasf=1", "sha256": "92233fbf891c63f3fb7a0b5e1ce108baa4c29a40c89a442d1313f883aae84670"},
+    {"file": "webview2-fixed-156.0.4314.58-x64.cab", "url": "https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/b7919cc9-680d-4253-bf32-732988e68aa6/Microsoft.WebView2.FixedVersionRuntime.156.0.4314.58.x64.cab", "sha256": "857dcfd6f7035508a29645fa2978c3a6a841f220df77cc366d318894e19f4792"},
+    {"file": "vc-redist-x64.exe", "url": "https://aka.ms/vs/17/release/vc_redist.x64.exe", "sha256": "cc0ff0eb1dc3f5188ae6300faef32bf5beeba4bdd6e8e445a9184072096b713b"},
+    {"file": "tools.innosetup.7.1.0.nupkg", "url": "https://api.nuget.org/v3-flatcontainer/tools.innosetup/7.1.0/tools.innosetup.7.1.0.nupkg", "sha256": "aad15c662593c6f5656457a5c001f4591babd72820cacf63f9706d4af5d93b75", "purpose": "release"}
+  ]
+}

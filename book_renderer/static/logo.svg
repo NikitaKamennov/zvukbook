@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="29" fill="#f3ead2"/>
+
+  <!-- Arms, legs and headphones sit behind the closed book. -->
+  <g fill="none" stroke="#142d26" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M30 72c-12 2-14 11-8 17 6 6 17 5 28 0"/>
+    <path d="M65 73c9 0 14 5 16 13"/>
+    <path d="M37 92c0 8-3 13-9 17"/>
+    <path d="M61 92c1 8 5 13 11 16"/>
+    <path d="M27 43v-5a24 24 0 0 1 48 0v7" stroke-width="8"/>
+  </g>
+  <path d="M24 110h8M70 109h8" fill="none" stroke="#142d26" stroke-width="6" stroke-linecap="round"/>
+  <path d="M27 39v-1a24 24 0 0 1 48 0" fill="none" stroke="#7fc5a7" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- A closed book with a visible spine and page block. -->
+  <path d="M32 28h33c5 0 8 4 8 9v50c0 5-3 8-8 8H32c-5 0-8-3-8-8V36c0-5 3-8 8-8z" fill="#286d58" stroke="#142d26" stroke-width="3"/>
+  <path d="M31 31v61" stroke="#a8dbba" stroke-width="4" stroke-linecap="round"/>
+  <path d="M66 34h3v54h-3" fill="#fff7e3"/>
+  <path d="M34 91h31" stroke="#cde6ca" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Squeezed-shut eyes and an open shouting mouth. -->
+  <path d="M38 53l8 4-8 3M61 53l-8 4 8 3" fill="none" stroke="#142d26" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <ellipse cx="50" cy="70" rx="5.5" ry="7" fill="#142d26"/>
+  <path d="M47 73c2-2 4-2 6 0" fill="none" stroke="#ee947e" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M38 47l-3-3M61 47l3-3" fill="none" stroke="#e3b856" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Ear cushions are in front of the cover. -->
+  <rect x="20" y="41" width="10" height="20" rx="5" fill="#142d26"/>
+  <rect x="69" y="41" width="10" height="20" rx="5" fill="#142d26"/>
+  <path d="M24 47v8M74 47v8" stroke="#a8dbba" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Both hands grip a megaphone aimed toward the right. -->
+  <path d="M58 65h10l25-12v29L68 72H58z" fill="#e6a63f" stroke="#142d26" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M93 52v31" stroke="#142d26" stroke-width="5" stroke-linecap="round"/>
+  <path d="M72 74l3 12h7l-3-9" fill="#c48632" stroke="#142d26" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M48 88c8 2 18 0 25-7M81 86l-4-5" fill="none" stroke="#142d26" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="73" cy="81" r="3.5" fill="#142d26"/>
+
+  <!-- Expansive sound waves. -->
+  <g fill="none" stroke="#d47a36" stroke-width="4" stroke-linecap="round">
+    <path d="M100 61a11 11 0 0 1 0 13"/>
+    <path d="M106 54a22 22 0 0 1 0 27"/>
+    <path d="M112 47a33 33 0 0 1 0 41"/>
+  </g>
+</svg>

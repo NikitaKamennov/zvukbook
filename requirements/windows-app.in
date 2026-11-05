@@ -1,0 +1,12 @@
+# Inputs for the first Windows desktop lock. Rebuilds use windows-app.lock.
+Flask==3.1.2
+waitress==3.0.2
+psutil==7.1.0
+lxml==6.0.2
+razdel==0.5.0
+pdfplumber==0.11.7
+pypdfium2==4.30.0
+python-docx==1.2.0
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+typing_extensions==4.15.0

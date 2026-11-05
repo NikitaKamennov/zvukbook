@@ -1,0 +1,27 @@
+{
+  "engine": "silero",
+  "model_id": "v5_6_ru",
+  "assets": [
+    {
+      "file": "model.pt",
+      "url": "https://models.silero.ai/models/tts/ru/v5_6_ru.pt",
+      "sha256": "04cc9b1d08ce38bcaa9d02c488d80d3e6806d17f7eaa7c95982f36a3cbf50b2e",
+      "bytes": 147664410
+    },
+    {
+      "file": "LICENSE",
+      "url": "https://raw.githubusercontent.com/snakers4/silero-models/master/LICENSE",
+      "sha256": "1349a4b6148492b44f629e64eed676612e234fe9a839e4f3b277c1482c8849f1",
+      "bytes": 20849
+    }
+  ],
+  "speakers": [
+    "aidar",
+    "baya",
+    "kseniya",
+    "xenia",
+    "eugene"
+  ],
+  "sample_rate": 24000,
+  "license": "CC-BY-NC-SA-4.0"
+}

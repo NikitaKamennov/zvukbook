@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Звуккниг · Zvukbook</title>
+  <link rel="icon" type="image/svg+xml" href="/static/logo.svg">
+  <script src="/static/theme.js"></script>
+  <link rel="stylesheet" href="/static/books.css">
+  <link rel="stylesheet" href="/static/gallery.css">
+  {% if desktop %}<link rel="stylesheet" href="/static/desktop.css">{% endif %}
+  <link rel="stylesheet" href="/static/theme.css">
+  <link rel="stylesheet" href="/static/pronunciation.css">
+  <link rel="stylesheet" href="/static/help.css">
+  <script src="/static/help.js" defer></script>
+  <script src="/static/pronunciation.js" defer></script>
+  <script src="/static/books.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><img class="brand-logo" src="/static/logo.svg" alt="" width="68" height="68"><div class="brand-copy"><p class="eyebrow">ZVUKBOOK · ЛОКАЛЬНАЯ ЛАБОРАТОРИЯ ОЗВУЧКИ</p><h1>Звук книг — слушай написанное</h1></div></div>
+    <div class="topbar-actions">
+      <button id="show-gallery" title="Вернуться к списку всех книг." type="button">Все книги</button>
+      <button id="open-help" type="button" title="Открыть руководство и ответы на частые вопросы">Помощь</button>
+      {% if desktop %}<button id="open-device-settings" title="Выбрать процессор или доступную видеокарту для следующих задач." type="button">Устройство озвучки</button>{% endif %}
+      <button id="theme-toggle" class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Тёмная тема" title="Включить тёмную тему">
+        <svg class="theme-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 13.2A8.6 8.6 0 0 1 10.8 3.5a8.7 8.7 0 1 0 9.7 9.7Z"/></svg>
+        <span>Тёмная тема</span><span class="theme-toggle-track" aria-hidden="true"></span>
+      </button>
+      <div class="device"><span class="led"></span><div><strong id="device-title">{{ 'Озвучка на CPU' if device == 'cpu' else 'Рендер на видеокарте' }}</strong><small id="resource-status">Подключение…</small></div></div>
+    </div>
+  </header>
+  <div id="notice" class="notice" role="status" hidden></div>
+  {% if desktop %}
+  <dialog id="device-settings" aria-labelledby="device-settings-title">
+    <form id="device-settings-form">
+      <div class="section-heading"><h2 id="device-settings-title">На чём озвучивать книги</h2><button id="device-settings-close" title="Закрыть настройки устройства без изменения выбора." type="button" class="quiet">Закрыть</button></div>
+      <p id="device-hardware" class="muted"></p>
+      <label class="device-choice"><input type="radio" name="device" value="cpu" id="device-cpu" checked><span><strong>Процессор · экономный режим</strong><small>Работает без NVIDIA. Короткие фрагменты и небольшая нагрузка; на слабом ноутбуке озвучка займёт больше времени.</small></span></label>
+      <label class="device-choice"><input type="radio" name="device" value="cuda" id="device-cuda"><span><strong>Видеокарта NVIDIA</strong><small id="device-gpu-description"></small></span></label>
+      <p class="muted small">Книги обрабатываются на этом компьютере. Резерв памяти для Windows сохраняется. При нехватке ресурсов приложение остановит задачу и сохранит готовые главы.</p>
+      <p id="device-settings-message" role="status" class="muted small"></p>
+      <button id="device-settings-save" title="Сохранить устройство для следующих задач озвучки." type="submit" class="primary">Сохранить выбор</button>
+    </form>
+  </dialog>
+  {% endif %}
+  <main class="layout">
+    <aside class="sidebar">
+      <section class="panel upload-panel">
+        <h2>Добавить книгу</h2>
+        <p class="muted">Файл и озвучка остаются на этой машине.</p>
+        <form id="upload-form">
+          <label class="file-label" for="book-file">Выбери файл книги</label>
+          <input id="book-file" type="file" accept=".fb2,.zip,.epub,.txt,.docx{% if allow_doc %},.doc{% endif %},.pdf,.djvu,.djv" required>
+          <small>FB2 · EPUB · TXT · Word · PDF · DJVU, до 100 MiB</small>
+          <button id="upload-button" title="Загрузить выбранный файл и подготовить текст и главы на этом компьютере." class="primary" type="submit" disabled>Загрузить и подготовить текст</button>
+        </form>
+      </section>
+      <section class="panel library-panel"><div class="section-heading"><h2>Библиотека</h2><span id="book-count" class="count">0</span></div><div id="library"></div></section>
+      <section class="hint"><strong>Сначала послушай образец</strong><p>Выбери приятный голос, затем озвучь книгу целиком. Для PDF сначала проверь распознанный текст.</p></section>
+    </aside>
+    <div class="workspace">
+      <section id="gallery-panel" aria-label="Галерея книг">
+        <div class="section-heading"><div><p class="eyebrow">ТВОЯ БИБЛИОТЕКА</p><h2>Книги для озвучки</h2></div><span id="gallery-count" class="tag"></span></div>
+        <div class="gallery-filters"><label>Найти книгу<input id="book-search" type="search" placeholder="Название, автор или файл"></label><label>Показать<select id="book-filter"><option value="all">Все книги</option><option value="audio">Есть аудио</option><option value="ready">Текст готов</option><option value="attention">Нужны действия</option></select></label></div>
+        <div id="gallery" class="gallery"></div>
+        <section id="empty" class="panel empty"><span class="empty-icon" aria-hidden="true">◖))</span><h2>От книги — к аудиокниге</h2><p>Загрузи файл слева. Здесь появятся главы, настройки чтеца и готовые MP3.</p><ol><li>Проверить текст</li><li>Выбрать голос</li><li>Скачать главы</li></ol></section>
+      </section>
+      <section id="book-panel" hidden>
+        <div class="book-heading"><div class="book-identity"><img id="book-cover-image" class="book-thumbnail" alt="Обложка книги" hidden><div><p id="book-author" class="eyebrow"></p><h2 id="book-title"></h2><p id="book-meta" class="muted"></p></div></div><div class="book-heading-actions"><button id="edit-metadata" title="Изменить название, автора или обложку книги." class="quiet" type="button">Название, автор и обложка</button><button id="delete-book" title="Удалить книгу вместе с исходным файлом, текстами и всеми MP3 после подтверждения." class="quiet danger" type="button">Удалить</button></div></div>
+        <div id="book-warnings" class="warnings" hidden></div>
+        <section class="panel reader-settings">
+          <div class="section-heading"><h3>Как будет звучать книга</h3><span class="tag">Silero · русский</span></div>
+          <div class="actions"><button id="open-pronunciation" title="Настроить замены и ударения для этой книги и проверить текст будущей озвучки." type="button">Произношение, замены и ударения</button><span id="pronunciation-count" class="muted small"></span></div>
+          <div class="settings-grid">
+            <label>Диктор<select id="voice"><option value="xenia">Ксения · xenia</option><option value="kseniya">Ксения · kseniya</option><option value="baya">Бая</option><option value="aidar">Айдар</option><option value="eugene">Евгений</option></select></label>
+            <label>Скорость готового MP3<select id="rate"><option value="0.75">0,75×</option><option value="0.9">0,9×</option><option value="1" selected>Обычная · 1×</option><option value="1.1">1,1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="1.75">1,75×</option></select></label>
+            <label>Высота голоса<select id="pitch"><option value="-2">Ниже</option><option value="0" selected>Обычная</option><option value="2">Выше</option></select></label>
+          </div>
+          <div class="actions"><button id="preview" title="Создать короткую звуковую пробу с выбранными настройками голоса." type="button">Создать короткий образец</button><button id="render-all" title="Заново озвучить все главы; новые MP3 заменят старые после успешной обработки." class="quiet" type="button">Озвучить всю книгу заново</button></div>
+          <p class="muted small">У главы один MP3. Повторная озвучка выделенной главы заменяет её файл. Для продолжения выбери только неозвученные — готовые главы останутся.</p>
+        </section>
+        <section id="job-panel" class="panel job-panel" hidden>
+          <div class="section-heading"><strong id="job-phase"></strong><button id="retry-publication" title="Повторить сохранение уже подготовленного MP3 без новой озвучки." class="quiet" type="button" hidden>Повторить публикацию MP3</button><button id="cancel-job" title="Остановить текущую задачу; уже опубликованные главы сохранятся." class="quiet" type="button">Остановить</button></div>
+          <progress id="job-progress" max="100" value="0"></progress><p id="job-detail" class="muted small"></p>
+          {% if desktop %}
+          <button id="retry-import" title="Попробовать снова извлечь текст книги из исходного файла." class="quiet" type="button" hidden>Извлечь текст заново</button>
+          <details id="job-diagnostics" hidden><summary>Диагностика</summary><pre id="job-diagnostics-text"></pre></details>
+          {% endif %}
+        </section>
+        <section id="chapters-panel" class="panel chapters-panel">
+          <div class="section-heading"><div><h3>Главы</h3><p id="chapter-summary" class="muted small"></p></div></div>
+          <div class="actions selection-actions"><button id="select-missing" title="Выделить главы без актуального аудио, чтобы продолжить озвучку." type="button">Выделить неозвученные</button><button id="render-selected" title="Озвучить отмеченные главы; готовые выбранные MP3 будут заменены." class="primary" type="button">Озвучить выделенные</button><button id="toggle-selection" title="Выделить все главы, включая уже озвученные." class="quiet" type="button">Выделить все</button><button id="clear-selection" title="Снять все отметки с глав." class="quiet" type="button">Снять выделение</button></div>
+          <div class="actions"><button id="cleanup-notes" title="Очистить текущий текст от распознанных примечаний и служебных элементов без повторного OCR." type="button">Очистить текст для озвучки без OCR</button></div>
+          <p class="muted small">Очистка убирает примечания, номера страниц и распознанные колонтитулы; удалённое сохраняется в отчёте. Содержательные числа переводятся в слова при озвучке.</p>
+          <p class="muted small">Изменённые главы потребуют озвучки. MP3 глав с неизменённым текстом сохранятся.</p>
+          <div class="export-row"><button id="open-folder" title="Открыть папку с MP3 этой книги на компьютере." type="button">Открыть папку MP3</button><a id="export" title="Скачать ZIP с актуальными готовыми главами и данными книги." class="button disabled" aria-disabled="true">Скачать готовые главы · ZIP</a></div>
+          <p id="audio-directory" class="muted small audio-directory"></p>
+          <div id="preview-audio" class="preview-audio" hidden></div>
+          <div id="chapters" class="chapters"></div>
+        </section>
+        <details class="panel import-settings">
+          <summary>Извлечение текста и очистка PDF/DJVU</summary>
+          <p class="muted small">Повторное извлечение заменит текущий текст результатом из оригинала, включая ручные исправления. Изменившимся главам понадобится новая озвучка.</p>
+          <div class="settings-grid">
+            <label>Кодировка TXT<select id="encoding"><option value="utf-8-sig">UTF-8</option><option value="cp1251">Windows-1251</option></select></label>
+            <label class="check"><input id="force-ocr" type="checkbox">Принудительный OCR всех страниц PDF/DJVU</label>
+            <label class="check"><input id="remove-headers" type="checkbox" checked>Убирать повторные колонтитулы PDF/DJVU</label>
+            <label class="check"><input id="clean-noise" type="checkbox" checked>Убирать оглавление, номера страниц и служебные строки</label>
+            <label class="check"><input id="skip-references" type="checkbox" checked>Исключать распознанные списки литературы в конце книги</label>
+            <label class="check"><input id="remove-editor-notes" type="checkbox" checked>Удалять примечания редактора/переводчика во всех форматах</label>
+            <label class="check"><input id="include-notes" type="checkbox">Включать разделы примечаний FB2/EPUB</label>
+          </div>
+          <p class="muted small">Очистка использует эвристики. Просмотри исключения; если они неверные, выключи нужные опции и повтори извлечение.</p>
+          <button id="reimport" title="Извлечь текст из оригинала с выбранными настройками; ручные правки будут заменены." type="button">Извлечь текст заново</button>
+          <div id="cleanup-summary" class="muted small"></div>
+          <a id="cleanup-report" title="Скачать полный отчёт об исключённом при очистке тексте." class="button quiet" hidden>Скачать полный отчёт очистки</a>
+          <div id="excluded" class="muted small"></div>
+        </details>
+      </section>
+    </div>
+  </main>
+  <dialog id="pronunciation" aria-labelledby="pronunciation-heading">
+    <div class="section-heading"><h2 id="pronunciation-heading">Подготовка текста к озвучке</h2><button id="pronunciation-close" title="Закрыть окно произношения; несохранённые изменения потребуют подтверждения." class="quiet" type="button">Закрыть</button></div>
+    <p id="pronunciation-book" class="eyebrow"></p>
+    <p class="muted small">Добавь правила, выбери главы и примени их к тексту. По умолчанию выбраны все главы. Изменения записываются в подготовленный текст книги; исходный загруженный файл остаётся прежним. Изменённые главы потребуется озвучить заново.</p>
+    <p id="pronunciation-legacy" class="muted small" hidden>Для этой книги уже были сохранены старые правила, действовавшие при озвучке. После применения выбранные главы используют исправленный текст; для остальных прежние правила пока сохраняются.</p>
+    <div class="pronunciation-rules-grid">
+      <section aria-labelledby="replacement-heading">
+        <h3 id="replacement-heading">Ручные замены <span id="replacement-count" class="count">0</span></h3>
+        <p class="muted small">Целые слова и фразы, без учёта регистра. Например: СССР → эс эс эс эр. Пустое «На что» удаляет совпадение из текста выбранных глав.</p>
+        <form id="replacement-form" class="pronunciation-rule-form">
+          <label>Что заменить<input id="replacement-from" maxlength="160" placeholder="СССР" required></label>
+          <label>На что заменить<input id="replacement-to" maxlength="500" placeholder="эс эс эс эр"></label>
+          <div class="actions"><button id="replacement-add" title="Добавить новую замену или сохранить изменение выбранного правила." type="submit">Добавить замену</button><button id="replacement-cancel" title="Отменить редактирование выбранной замены." class="quiet" type="button" hidden>Отменить правку</button></div>
+        </form>
+        <div id="replacement-list" class="pronunciation-rule-list"></div>
+      </section>
+      <section aria-labelledby="stress-heading">
+        <h3 id="stress-heading">Ударения <span id="stress-count" class="count">0</span></h3>
+        <p class="muted small">Выдели одну ударную гласную заглавной: злодЕй. Можно написать злоде́й или злод+ей. Каждая словоформа задаётся отдельно: злодЕй, злодЕя.</p>
+        <form id="stress-form" class="pronunciation-rule-form">
+          <label>Слово с ударением<input id="stress-word" maxlength="80" placeholder="злодЕй" required></label>
+          <div class="actions"><button id="stress-add" title="Добавить ударение или сохранить изменение выбранного правила." type="submit">Добавить ударение</button><button id="stress-cancel" title="Отменить редактирование выбранного ударения." class="quiet" type="button" hidden>Отменить правку</button></div>
+        </form>
+        <div id="stress-list" class="pronunciation-rule-list"></div>
+      </section>
+    </div>
+    <section class="pronunciation-editor" aria-labelledby="pronunciation-text-heading">
+      <h3 id="pronunciation-text-heading">Быстрое редактирование и предпросмотр</h3>
+      <label>Глава<select id="pronunciation-chapter"></select></label>
+      <div class="pronunciation-text-grid">
+        <label>Текущий текст главы — можно исправить<textarea id="pronunciation-source" rows="13" maxlength="1000000" spellcheck="true"></textarea></label>
+        <label>Текст для озвучки<textarea id="pronunciation-spoken" rows="13" readonly spellcheck="false"></textarea></label>
+      </div>
+      <p class="muted small">Справа показан будущий текст речи с правилами, без создания звука. В сохранённом тексте ударная гласная отмечена знаком ударения; справа ей соответствует + перед гласной. После применения проверь падежи и поправь их вручную.</p>
+      <div class="actions"><button id="pronunciation-preview" title="Показать, как текущий текст и правила будут подготовлены для озвучки, без создания аудио." type="button">Обновить предпросмотр</button><button id="replacement-selection" title="Подставить выделенный в исходном тексте фрагмент в поле замены." class="quiet" type="button">Выделенное → замена</button><button id="stress-selection" title="Подставить выделенное в исходном тексте слово в поле ударения." class="quiet" type="button">Выделенное → ударение</button><button id="pronunciation-save-chapter" type="button" title="Сохранить только ручные правки этой главы без повторного применения правил.">Сохранить правку главы</button></div>
+      <p id="pronunciation-stats" class="muted small"></p>
+    </section>
+    <details class="pronunciation-targets">
+      <summary>Главы для применения правил <span id="pronunciation-target-count" class="muted small"></span></summary>
+      <p class="muted small">Отмечены все главы. Сними отметки там, где текст менять не нужно.</p>
+      <div class="actions"><button id="pronunciation-target-all" type="button" title="Выбрать все главы книги.">Выбрать все</button><button id="pronunciation-target-none" type="button" title="Снять отметки со всех глав.">Снять все</button></div>
+      <div id="pronunciation-target-list" class="pronunciation-target-list"></div>
+    </details>
+    <div class="pronunciation-footer"><div><p id="pronunciation-message" class="muted small" role="status"></p><button id="pronunciation-changes-open" type="button" hidden title="Открыть список изменений последнего применения."></button></div><button id="pronunciation-save" title="Применить правила к выбранным главам и сохранить текущую ручную правку." class="primary" type="button">Применить правила к выбранным главам</button></div>
+  </dialog>
+  <dialog id="pronunciation-changes" aria-labelledby="pronunciation-changes-heading">
+    <div class="section-heading"><h2 id="pronunciation-changes-heading">Изменения в тексте</h2><button id="pronunciation-changes-close" class="quiet" type="button" title="Вернуться к правилам и тексту книги.">Закрыть</button></div>
+    <p class="muted small">Выбери изменение, чтобы перейти к этому месту в тексте главы. Исправь формулировку и нажми «Сохранить правку главы». Список относится к последнему применению и доступен до закрытия окна.</p>
+    <div id="pronunciation-changes-list" class="pronunciation-changes-list"></div>
+    <button id="pronunciation-changes-more" type="button" hidden title="Показать следующую часть списка изменений.">Показать ещё</button>
+  </dialog>
+  {% include 'help.html' %}
+  <footer class="player"><div><strong id="player-title">Готовые главы можно слушать здесь</strong><small id="player-subtitle">Выбери «Слушать» рядом с MP3.</small></div><audio id="audio-player" controls preload="metadata"></audio></footer>
+  <dialog id="editor"><form id="editor-form"><div class="section-heading"><h2>Проверить текст главы</h2><button id="editor-close" title="Закрыть редактор главы без сохранения." class="quiet" type="button">Закрыть</button></div><p class="muted small">После правки эта глава попадёт в неозвученные. Готовые MP3 остальных глав сохранятся.</p><label>Название<input id="chapter-title" maxlength="200" required></label><label>Текст<textarea id="chapter-text" rows="16" maxlength="1000000" required spellcheck="true"></textarea></label><div class="actions"><button id="editor-save" title="Сохранить название и текст главы; изменённой главе потребуется новая озвучка." class="primary" type="submit">Сохранить текст</button><span id="editor-message" role="status"></span></div></form></dialog>
+  <dialog id="metadata" aria-labelledby="metadata-heading">
+    <form id="metadata-form">
+      <div class="section-heading"><h2 id="metadata-heading">Название, автор и обложка</h2><button id="metadata-close" title="Закрыть окно метаданных без сохранения." class="quiet" type="button">Закрыть</button></div>
+      <div class="metadata-grid">
+        <section class="metadata-cover-block" aria-labelledby="metadata-cover-heading">
+          <h3 id="metadata-cover-heading">Обложка книги</h3>
+          <div class="metadata-cover-preview"><img id="metadata-cover-image" alt="Обложка книги" hidden><p id="metadata-cover-empty" class="muted small">Обложка не добавлена</p></div>
+          <p id="metadata-cover-caption" class="muted small"></p>
+          <label for="metadata-cover-file">Выбрать свою обложку</label>
+          <input id="metadata-cover-file" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp">
+          <button id="metadata-cover-reset" title="Отменить выбор новой картинки обложки." class="quiet" type="button" hidden>Отменить выбор картинки</button>
+          <p class="muted small">JPG, PNG или WebP, до 16 MiB и 20 млн пикселей. Обложка сохранится рядом с MP3 и попадёт в ZIP.</p>
+        </section>
+        <div><label>Название книги<input id="metadata-title" maxlength="500" required></label><label>Автор<input id="metadata-author" maxlength="500"></label><p class="muted small">Готовые MP3 сохранятся. Своя обложка останется и после повторного извлечения текста.</p></div>
+      </div>
+      <p id="metadata-message" class="muted small" role="status"></p>
+      <div class="actions"><button id="metadata-save" title="Сохранить название, автора и выбранную обложку книги." class="primary" type="submit">Сохранить</button></div>
+    </form>
+  </dialog>
+</body>
+</html>

@@ -1,0 +1,12 @@
+#help-dialog {width:min(860px,94vw); line-height:1.6;}
+#help-dialog .section-heading {align-items:flex-start;}
+#help-dialog .section-heading .eyebrow {margin-bottom:4px;}
+#help-dialog .section-heading h2 {margin:0;}
+.help-section {margin-top:26px; padding-top:20px; border-top:1px solid var(--line);}
+.help-section h3 {font-size:1.1rem; margin-bottom:12px;}
+.help-steps {padding-left:1.4em; margin:0;}
+.help-steps li {padding-left:4px; margin:10px 0;}
+.help-faq details {border-top:1px solid var(--line); padding:13px 0;}
+.help-faq summary {cursor:pointer; font-weight:650;}
+.help-faq details p {margin:10px 0 0; color:var(--muted);}
+@media(max-width:720px) {#help-dialog {padding:20px;} .help-faq summary {line-height:1.45;}}
