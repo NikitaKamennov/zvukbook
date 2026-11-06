@@ -1,18 +1,20 @@
 """Local cover extraction inside the import worker; publication by the host."""
 import base64
 from io import BytesIO
+import math
 import os
 from pathlib import PurePosixPath
 import posixpath
 import re
 import shutil
+import subprocess
 from urllib.parse import unquote, urlsplit
 from uuid import uuid4
 
 from .audio import audio_dir
 from .config import DISK_RESERVE
 from .diagnostics import failure_details, record, record_failure
-from .platform import checkpoint
+from .platform import checkpoint, run_tool, tool
 from .storage import database, digest, fetch_book
 
 
@@ -126,6 +128,9 @@ def epub_cover(source, output):
             if identifier in items:
                 candidates.append(items[identifier].get("href"))
         candidates.extend(package.xpath("//*[local-name()='guide']/*[local-name()='reference' and @type='cover']/@href"))
+        spine = package.xpath("//*[local-name()='spine']/*[local-name()='itemref']/@idref")
+        if spine and spine[0] in items:
+            candidates.append(items[spine[0]].get("href"))
         tried = set()
         last_error = None
         for href in candidates[:12]:
@@ -158,17 +163,56 @@ def epub_cover(source, output):
         archive.close()
 
 
+def pdf_cover(source, output):
+    import pypdfium2
+    with pypdfium2.PdfDocument(str(source)) as document:
+        if not len(document):
+            return None
+        page = document[0]
+        try:
+            width, height = page.get_size()
+            if not all(math.isfinite(value) and value > 0 for value in (width, height)):
+                raise ValueError("Недопустимый размер первой страницы PDF.")
+            bitmap = page.render(scale=min(2, COVER_SIZE[0] / width, COVER_SIZE[1] / height))
+            try:
+                image = bitmap.to_pil()
+                try:
+                    return save_image(image, output)
+                finally:
+                    image.close()
+            finally:
+                bitmap.close()
+        finally:
+            page.close()
+
+
+def djvu_cover(source, output):
+    from PIL import Image
+    page = output / "cover-page.ppm"
+    try:
+        run_tool([tool("ddjvu"), "-format=ppm", "-page=1", "-size=1200x1600", "-aspect=yes", str(source), str(page)],
+                 check=True, timeout=90, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        with Image.open(page) as image:
+            return save_image(image, output)
+    finally:
+        page.unlink(missing_ok=True)
+
+
 def extract_cover(source, kind, output, document):
     """An optional image failure never hides a successful text import."""
-    if kind not in ("fb2", "fb2.zip", "epub"):
+    if kind not in ("fb2", "fb2.zip", "epub", "pdf", "djvu", "djv"):
         return
     checkpoint()
     record("cover_extraction_started", format=kind)
     try:
         if kind in ("fb2", "fb2.zip"):
             cover = fb2_cover(source, output)
-        else:
+        elif kind == "epub":
             cover = epub_cover(source, output)
+        elif kind == "pdf":
+            cover = pdf_cover(source, output)
+        else:
+            cover = djvu_cover(source, output)
         if cover:
             document["cover"] = cover
             record("cover_extraction_finished", width=cover["width"], height=cover["height"])
@@ -197,10 +241,8 @@ def stored_cover(book_id, connection=None):
 
 
 def visible_cover(book, connection=None):
-    # Older imports saved the first scanned page as a cover. Keep the file on
-    # disk, but don't present or export it as a real cover unless user supplied it.
-    if book["format"] in ("pdf", "djvu", "djv") and not book.get("custom_cover"):
-        return None
+    # An existing image is always preferable to a placeholder, including
+    # images extracted from older PDF/DjVu imports.
     return stored_cover(book["id"], connection)
 
 

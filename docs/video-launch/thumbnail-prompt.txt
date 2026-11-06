@@ -1,0 +1,11 @@
+Use case: ads-marketing.
+Asset type: a finished Russian YouTube thumbnail for a practical desktop app demonstration, widescreen 16:9, preferably 3840x2160. Not a screenshot or UI mockup.
+Primary request: make a bold, highly legible, witty thumbnail showing a local neural network reading books on an ordinary PC, no NVIDIA required. The app is called «Звук книг» and uses a book mascot.
+Composition: use the left 55 percent for very large headline typography and the right 45 percent for one expressive mascot plus a simple ordinary laptop behind it. Strong silhouette, generous safe margins, bottom-right corner mostly dark and uncluttered for YouTube's duration overlay. Readable on a phone. All lettering must be on the canvas, not cropped.
+Subject: a CLOSED emerald green hardcover book with a visible cream page edge and spine, wearing big dark headphones. It has simple black sausage-like arms and legs, squeezed-shut expressive eyes and an open shouting mouth. Its hands grip a warm orange megaphone at its mouth, with three large clean orange sound arcs coming out. Funny energetic confident pose. An ordinary modest laptop behind the book has a simple luminous sound waveform on the screen, no fake detailed app interface. Premium polished illustration, tactile 3D/cartoon hybrid with crisp outlines and subtle depth.
+Background: near-black forest green with restrained light accents. Existing brand palette: forest green #194d40, emerald #286d58, cream #f3ead2, orange #e6a63f. High contrast, no clutter, no generic robot heads, no human presenter, no stock-photo face.
+Text, exact Cyrillic lettering only:
+- very large main headline on the left in 3 lines: «ИИ» then «ЧИТАЕТ» then «КНИГИ». Heavy condensed sans-serif, cream and orange, dramatic but clean.
+- compact secondary badge: «ЛОКАЛЬНО НА ВАШЕМ ПК» on two lines.
+- small brand identifier near top: «ЗВУК КНИГ».
+No other text. No prices, no "one click", no speed numbers, no unverified claims about weak hardware. No watermarks. Do not render quotation marks around the copy. The mascot looks like a closed living book, not an open book or humanoid robot.

@@ -39,10 +39,12 @@ def remove_owned(path):
         shutil.rmtree(path)
 
 
-def fetch_all():
+def fetch_all(include_release_tools=False):
     DOWNLOADS.mkdir(parents=True, exist_ok=True)
     manifest = json.loads((ROOT / "config/windows-downloads.json").read_text(encoding="utf-8"))
     for record in manifest["files"]:
+        if record.get("purpose") == "release" and not include_release_tools:
+            continue
         target = DOWNLOADS / record["file"]
         if target.is_file() and sha(target) == record["sha256"]:
             continue
@@ -237,12 +239,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--exe", type=Path, required=True)
     parser.add_argument("--edition", choices=("full", "cpu"), default="full")
+    parser.add_argument("--include-release-tools", action="store_true")
     args = parser.parse_args()
     if sys.platform != "win32" or sys.version_info[:3] != (3, 12, 10):
         raise RuntimeError("Use CPython 3.12.10 x64 on Windows")
     if shutil.which("curl.exe") is None:
         raise RuntimeError("Windows curl.exe is required for verified downloads")
-    manifest = fetch_all()
+    manifest = fetch_all(include_release_tools=args.include_release_tools)
     devices = ("cpu",) if args.edition == "cpu" else ("cpu", "cuda")
     signatures = prepare_environments(devices)
     extract_tools()

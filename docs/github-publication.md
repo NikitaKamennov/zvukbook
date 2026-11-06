@@ -68,9 +68,9 @@ Windows-сборщик готовит зависимости по lock/manifest.
 скрытно не скачивается.
 
 Для нового локального выпуска задай версию в `config/windows-release.json`
-и выполни [команды сборки](../README.md#windows-сборка-установщика-и-portable).
-Полные артефакты создаются в `.local-data/windows-x64/release/`, CPU — в
-`release-cpu/`. Файлы, SHA256SUMS и manifest остаются локально.
+и выполни [команды сборки portable](../README.md#windows-сборка-portable).
+Полный архив создаётся в `.local-data/windows-x64/portable/`, CPU — в
+`portable-cpu/`. Файлы, SHA256SUMS и manifest остаются локально.
 
 Сборщик не запускает приложение/установщик и не заменяет ручную приёмку.
 Публикация бинарников не является частью этого GitHub-проекта. MIT приложения

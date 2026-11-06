@@ -438,7 +438,7 @@ def extract(source, kind, options, output, progress, *, include_cover=True):
         chapter["title"] = clean(chapter["title"])[:200] or "Глава " + str(index)
     result.update(schema="projectpro-local-book-v1", normalizer_version=NORMALIZER_VERSION,
                   import_options=options)
-    if include_cover and kind in ("fb2", "fb2.zip", "epub"):
+    if include_cover and kind in ("fb2", "fb2.zip", "epub", "pdf", "djvu", "djv"):
         from .covers import extract_cover
         progress("Извлечение обложки", 1, 1)
         extract_cover(source, kind, output, result)

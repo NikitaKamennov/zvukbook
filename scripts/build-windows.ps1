@@ -1,6 +1,10 @@
-param([string]$Python = 'C:\Python312\python.exe', [switch]$Release,
+param([string]$Python = 'C:\Python312\python.exe', [switch]$Release, [switch]$Portable,
       [ValidateSet('full', 'cpu')][string]$Edition = 'full')
 $ErrorActionPreference = 'Stop'
+if ($env:OS -ne 'Windows_NT' -or -not [Environment]::Is64BitOperatingSystem) {
+    throw 'Build on 64-bit Windows; this script cannot assemble a Windows bundle on Linux.'
+}
+if ($Release -and $Portable) { throw 'Choose -Release or -Portable, not both.' }
 $Edition = $Edition.ToLowerInvariant()
 $buildProject = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $buildWindows = Join-Path $buildProject '.local-data\windows-x64'
@@ -22,11 +26,17 @@ try {
     $env:GOTOOLCHAIN = 'local'
     & go -C (Join-Path $buildProject 'desktop') build -mod=readonly -tags desktop,production -trimpath -ldflags '-H=windowsgui -s -w' -o $buildStaging ./cmd/zvukbook
     if ($LASTEXITCODE -ne 0) { throw 'Go/Wails build failed; the previous EXE was not replaced.' }
-    & $Python -I (Join-Path $PSScriptRoot 'windows\package_bundle.py') --exe $buildStaging --edition $Edition
+    $bundleArgs = @('-I', (Join-Path $PSScriptRoot 'windows\package_bundle.py'), '--exe', $buildStaging, '--edition', $Edition)
+    if ($Release) { $bundleArgs += '--include-release-tools' }
+    & $Python @bundleArgs
     if ($LASTEXITCODE -ne 0) { throw 'Windows bundle preparation failed. Inspect the error above.' }
     if ($Release) {
         & $Python -I (Join-Path $PSScriptRoot 'windows\package_release.py') --edition $Edition
         if ($LASTEXITCODE -ne 0) { throw 'Release packaging failed. Inspect the error above.' }
+    }
+    if ($Portable) {
+        & $Python -I (Join-Path $PSScriptRoot 'windows\package_release.py') --edition $Edition --portable-only
+        if ($LASTEXITCODE -ne 0) { throw 'Portable packaging failed. Inspect the error above.' }
     }
 } finally {
     $env:GOTOOLCHAIN = $buildPriorToolchain
